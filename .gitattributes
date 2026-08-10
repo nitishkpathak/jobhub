@@ -1,0 +1,8 @@
+# GitHub Linguist Configuration for JobHub
+
+# Detect Java Backend
+backend/**/*.java linguist-language=Java
+
+# Detect React Frontend
+frontend/**/*.jsx linguist-language=JavaScript
+frontend/**/*.js linguist-language=JavaScript
