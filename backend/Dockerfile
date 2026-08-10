@@ -1,6 +1,7 @@
 # Multi-stage Docker build for Spring Boot Backend
 FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
 WORKDIR /app
+ENV MAVEN_OPTS="-Xmx256m"
 COPY pom.xml .
 COPY src ./src
 RUN mvn clean package -DskipTests
@@ -9,4 +10,4 @@ FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Xmx256m", "-Xms128m", "-jar", "app.jar"]
