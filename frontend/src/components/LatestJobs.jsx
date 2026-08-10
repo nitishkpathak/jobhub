@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { jobService, savedJobService } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import JobCard from './JobCard';
-import Loading from './Loading';
 import { ArrowRight, Briefcase, AlertCircle } from 'lucide-react';
 
 const LatestJobs = () => {
@@ -19,16 +18,15 @@ const LatestJobs = () => {
 
   const fetchLatestJobs = async () => {
     try {
-      setLoading(true);
       setError('');
       const res = await jobService.getLatestJobs();
-      const jobs = res.data.data || [];
+      const jobs = res?.data?.data || [];
       setLatestJobs(jobs);
 
       if (isAuthenticated && isCandidate) {
         try {
           const savedRes = await savedJobService.getSavedJobs();
-          const ids = new Set((savedRes.data.data || []).map(s => s.job.id));
+          const ids = new Set((savedRes?.data?.data || []).map(s => s.job?.id));
           setSavedJobIds(ids);
         } catch (e) {
           // ignore
@@ -54,8 +52,16 @@ const LatestJobs = () => {
         </Link>
       </div>
 
-      {loading ? (
-        <Loading text="Loading latest jobs from MySQL database..." />
+      {loading && latestJobs.length === 0 ? (
+        <div className="grid-3">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="card" style={{ padding: '1.5rem', borderRadius: '16px', minHeight: '180px', background: '#f8fafc', animation: 'pulse 1.5s infinite' }}>
+              <div style={{ width: '40%', height: '20px', background: '#e2e8f0', borderRadius: '6px', marginBottom: '1rem' }}></div>
+              <div style={{ width: '70%', height: '16px', background: '#cbd5e1', borderRadius: '6px', marginBottom: '0.75rem' }}></div>
+              <div style={{ width: '50%', height: '14px', background: '#e2e8f0', borderRadius: '6px' }}></div>
+            </div>
+          ))}
+        </div>
       ) : error ? (
         <div className="card" style={{ padding: '2rem', textAlign: 'center', color: '#be123c', background: '#ffe4e6' }}>
           <AlertCircle size={24} style={{ marginBottom: '0.5rem' }} />

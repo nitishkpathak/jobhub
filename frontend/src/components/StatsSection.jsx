@@ -3,9 +3,8 @@ import { homeService } from '../services/api';
 import { Briefcase, Building2, GraduationCap, Users } from 'lucide-react';
 
 const StatsSection = () => {
-  const [stats, setStats] = useState(null);
+  const [stats, setStats] = useState({ totalJobs: 0, totalCompanies: 0, internships: 0, activeRecruiters: 0 });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
 
   useEffect(() => {
     fetchStats();
@@ -13,18 +12,16 @@ const StatsSection = () => {
 
   const fetchStats = async () => {
     try {
-      setLoading(true);
       const res = await homeService.getHomeStats();
-      setStats(res.data.data);
+      if (res?.data?.data) {
+        setStats(res.data.data);
+      }
     } catch (err) {
       console.error('Error loading live home statistics', err);
-      setError(true);
     } finally {
       setLoading(false);
     }
   };
-
-  if (error) return null;
 
   return (
     <section style={{ marginBottom: '4rem' }}>
@@ -40,7 +37,7 @@ const StatsSection = () => {
           </div>
           <div>
             <h3 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#0f172a' }}>
-              {loading ? '...' : (stats?.totalJobs ?? 0)}
+              {stats.totalJobs}
             </h3>
             <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: 600 }}>Total Jobs</span>
           </div>
@@ -52,7 +49,7 @@ const StatsSection = () => {
           </div>
           <div>
             <h3 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#0f172a' }}>
-              {loading ? '...' : (stats?.totalCompanies ?? 0)}
+              {stats.totalCompanies}
             </h3>
             <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: 600 }}>Companies</span>
           </div>
@@ -64,7 +61,7 @@ const StatsSection = () => {
           </div>
           <div>
             <h3 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#0f172a' }}>
-              {loading ? '...' : (stats?.internships ?? 0)}
+              {stats.internships}
             </h3>
             <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: 600 }}>Internships</span>
           </div>
@@ -76,7 +73,7 @@ const StatsSection = () => {
           </div>
           <div>
             <h3 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#0f172a' }}>
-              {loading ? '...' : (stats?.activeRecruiters ?? 0)}
+              {stats.activeRecruiters}
             </h3>
             <span style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontWeight: 600 }}>Active Recruiters</span>
           </div>
