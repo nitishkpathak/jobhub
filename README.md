@@ -1,5 +1,8 @@
 # 💼 JobHub — Full-Stack Job Portal & AI Candidate Recommendation System
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-jobhub--livid.vercel.app-2563eb?style=for-the-badge&logo=vercel)](https://jobhub-livid.vercel.app)
+[![Backend API](https://img.shields.io/badge/Backend%20API-up.railway.app-purple?style=for-the-badge&logo=railway)](https://jobhub-production-fda3.up.railway.app)
+
 ![Java](https://img.shields.io/badge/Java-21-orange.svg)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen.svg)
 ![Spring Security](https://img.shields.io/badge/Spring%20Security-JWT-red.svg)
@@ -11,6 +14,10 @@
 
 **JobHub** is a production-ready full-stack job portal web application built with **Java 21**, **Spring Boot 3**, **MySQL 8**, **React.js**, and an **AI Candidate Recommendation Engine**. 
 
+- 🌐 **Live Web Application:** [https://jobhub-livid.vercel.app](https://jobhub-livid.vercel.app)
+- ⚙️ **Live Backend REST API:** [https://jobhub-production-fda3.up.railway.app](https://jobhub-production-fda3.up.railway.app)
+- 🐙 **GitHub Repository:** [https://github.com/nitishkpathak/jobhub](https://github.com/nitishkpathak/jobhub)
+
 Everything in this project connects dynamically to real MySQL database entities via Spring Boot REST APIs — with **zero hardcoded fake jobs, zero fake numbers, and zero fake companies**.
 
 ---
@@ -18,6 +25,7 @@ Everything in this project connects dynamically to real MySQL database entities 
 ## 📄 Resume Project Section (Copy-Paste Ready for Your Resume)
 
 > **JobHub — Full-Stack Job Portal & AI Candidate Recommendation System**  
+> **Live Demo:** [jobhub-livid.vercel.app](https://jobhub-livid.vercel.app) | **GitHub:** [github.com/nitishkpathak/jobhub](https://github.com/nitishkpathak/jobhub)  
 > **Tech Stack:** Java 21, Spring Boot 3, Spring Security (JWT), MySQL 8, React 18, Vite, Axios, REST APIs  
 > **AI & Data Science Tech:** Natural Language Processing (NLP) Skill Tokenization, Jaccard Similarity Algorithm, Multi-Factor Weighted Scoring Engine  
 > - **Engineered** a production-ready full-stack job platform supporting Candidate & Recruiter role workflows with stateless **JWT Authentication** and **BCrypt Password Hashing**.
@@ -161,9 +169,9 @@ npm run dev
 ---
 
 ## 🚀 Live Deployment
-- **Frontend:** Vercel (preset: Vite, root directory: `frontend`)
-- **Backend:** Render / Railway / Docker (uses included `Dockerfile`)
-- **Database:** Aiven for MySQL / Railway MySQL
+- **Frontend App:** [https://jobhub-livid.vercel.app](https://jobhub-livid.vercel.app)
+- **Backend API:** [https://jobhub-production-fda3.up.railway.app](https://jobhub-production-fda3.up.railway.app)
+- **Database:** Railway MySQL
 
 ---
 
