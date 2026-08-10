@@ -4,13 +4,75 @@
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen.svg)
 ![Spring Security](https://img.shields.io/badge/Spring%20Security-JWT-red.svg)
 ![React](https://img.shields.io/badge/React-18-blue.svg)
+![AI Matching](https://img.shields.io/badge/AI-NLP%20%26%20Jaccard%20Similarity-purple.svg)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-blue.svg)
 ![Vite](https://img.shields.io/badge/Vite-6.x-yellow.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 
-**JobHub** is a production-ready full-stack job portal application built with **Java 21**, **Spring Boot 3**, **MySQL 8**, **React.js**, and an **AI Candidate Recommendation Engine**. 
+**JobHub** is a production-grade full-stack job portal application built with **Java 21**, **Spring Boot 3**, **MySQL 8**, **React.js**, and an **AI Candidate Recommendation Engine**. 
 
 Everything in this project connects dynamically to real MySQL database entities via Spring Boot REST APIs — with **zero hardcoded fake jobs, fake numbers, or fake companies**.
+
+---
+
+## 📂 Project Directory Structure
+
+```
+jobhub/
+├── backend/                              # Java Spring Boot Backend
+│   ├── src/main/java/com/jobhub/jobhub/
+│   │   ├── config/                      # SecurityConfig (JWT & CORS Configuration)
+│   │   ├── controller/                  # REST Controllers (Job, Company, AI, Application, Auth)
+│   │   ├── dto/                         # Data Transfer Objects (Request / Response / Stats)
+│   │   ├── entity/                      # JPA Entities (User, Job, Company, Application, SavedJob)
+│   │   ├── exception/                   # Global Exception Handler & Custom Exceptions
+│   │   ├── repository/                 # Spring Data JPA Repositories
+│   │   ├── security/                   # JwtAuthenticationFilter & JwtProvider
+│   │   └── service/                    # Business Logic & AiRecommendationService
+│   ├── src/main/resources/              # application.properties & Database Config
+│   ├── pom.xml                          # Maven Dependencies & Build Configuration
+│   └── Dockerfile                       # Multi-stage Container Deployment File
+│
+├── frontend/                             # React.js + Vite Frontend
+│   ├── src/
+│   │   ├── components/                  # Reusable Components (JobCard, CompanyCard, JobFilters, etc.)
+│   │   ├── context/                     # AuthContext (Authentication State & LocalStorage)
+│   │   ├── pages/                       # Page Views (Home, Jobs, Companies, JobDetails, About, etc.)
+│   │   ├── services/                    # Axios API Interceptor Service Layer
+│   │   ├── App.jsx                      # React Router Navigation Routes
+│   │   └── index.css                    # Responsive CSS3 Tokens & Breakpoints
+│   ├── package.json                     # Frontend Dependencies
+│   └── vercel.json                      # Vercel Deployment SPA Routing Config
+│
+└── README.md                             # Project Documentation
+```
+
+---
+
+## 🛠️ Full Technology Stack (Including AI Tech)
+
+### 🤖 AI & Matching Technology Stack:
+- **AI Recommendation Engine:** Implemented in `AiRecommendationService.java` & `AiRecommendationController.java`.
+- **NLP Text Tokenization:** Lowercasing, punctuation stripping, and canonical skill extraction.
+- **Jaccard Similarity Index:** Mathematical set distance algorithm for skill overlap computation ($J(A,B) = \frac{|A \cap B|}{|A \cup B|}$).
+- **Cosine Similarity Model:** Vector space similarity representation.
+- **Weighted Match Engine:** $70\% \text{ Skill Match} + 20\% \text{ Experience Match} + 10\% \text{ Location Match}$.
+- **Skill Gap Analysis:** Set difference operator $(B \setminus A)$ to generate automated developer learning advice.
+
+### ⚙️ Backend Technology Stack:
+- **Language:** Java 21
+- **Framework:** Spring Boot 3.x (Spring Web, Spring Data JPA, Hibernate ORM)
+- **Security:** Spring Security, Stateless **JWT Bearer Token** Authentication, **BCrypt** Password Hashing ($2^{10}$ rounds)
+- **Database:** MySQL 8.0 Relational Database
+- **Containerization:** Docker (Multi-stage Eclipse Temurin JRE build)
+
+### 🎨 Frontend Technology Stack:
+- **Library:** React.js 18
+- **Build Tool:** Vite 6.x
+- **Routing:** React Router v6 (Single Page Application)
+- **HTTP Client:** Axios (With Request & Response Interceptors)
+- **Icons:** Lucide React Icons
+- **Styling:** Custom CSS3 (CSS Variables, Flexbox, Responsive Grid)
 
 ---
 
@@ -22,7 +84,7 @@ Everything in this project connects dynamically to real MySQL database entities 
 - **Skill Gap & Learning Advice:** Receive automated insights on missing technical skills for each job.
 - **Application Status Pipeline:** Submit applications with cover letters and track live status updates (*APPLIED ➔ REVIEWING ➔ SHORTLISTED ➔ SELECTED / REJECTED*).
 - **PDF Resume Upload & Profile:** Upload PDF resumes, add portfolio links, expected CTC, notice period, and immediate joiner badges.
-- **Saved Jobs (Bookmarks):** Save favorite jobs to review later from the candidate dashboard.
+- **Saved Jobs (Bookmarks):** Save favorite jobs to review later from candidate dashboard.
 
 ### 🏢 Recruiter Features:
 - **Company Profile Management:** Create, edit, and update company details (*Logo URL, Industry, Website, Location, Employee Size, Founded Year*).
@@ -30,51 +92,6 @@ Everything in this project connects dynamically to real MySQL database entities 
 - **Applicant Inspection:** Review candidate profiles, cover letters, and inspect uploaded PDF resumes with 1-click preview links.
 - **Application Status Updates:** Update applicant statuses dynamically in real-time.
 - **Recruiter Analytics Dashboard:** View total posted jobs, total applications received, active candidates, and recruitment stats.
-
----
-
-## 🤖 AI Recommendation System (`AiRecommendationService.java`)
-
-The AI module computes dynamic match percentages between candidate skills and job requirements using Set Tokenization and Jaccard Similarity.
-
-```
-Candidate Profile Skills ➔ String Tokenization (Lowercasing & Normalization)
-                                    │
-                                    ▼
-                 Jaccard Skill Overlap Calculation
-                                    │
-                                    ▼
-       Weighted Score: 70% Skill Match + 20% Exp Match + 10% Location Match
-                                    │
-                                    ▼
-       Output: Match Percentage (e.g., 92%) + Skill Gap (e.g., Docker, AWS)
-```
-
----
-
-## 🛠️ Exact Technology Stack
-
-### Backend:
-- **Java 21**
-- **Spring Boot 3.x** (Spring Web, Spring Data JPA, Hibernate ORM)
-- **Spring Security** (Stateless JWT Bearer Token Authentication, BCrypt Password Hashing)
-- **MySQL 8.0** Relational Database
-
-### Frontend:
-- **React.js 18** (Vite Build Tool, React Router v6 SPA)
-- **Axios** (With Request Interceptor for Bearer Tokens & Response Interceptor)
-- **Lucide React** (Clean Modern UI Icons)
-- **Vanilla CSS3** (Custom Design Tokens, Flexbox, Responsive Breakpoints)
-
----
-
-## 📁 Actual Database Entities
-
-- `User`: `id`, `name`, `email`, `password`, `role`, `profilePic`, `headline`, `bio`, `skills`, `location`, `resumeUrl`, `portfolioUrl`, `noticePeriod`, `expectedCtc`.
-- `Job`: `id`, `title`, `companyName`, `companyId`, `description`, `location`, `jobType`, `experienceLevel`, `salaryMin`, `salaryMax`, `skills`, `recruiterId`, `createdAt`, `updatedAt`.
-- `Company`: `id`, `name`, `logoUrl`, `description`, `industry`, `website`, `location`, `companySize`, `foundedYear`, `recruiterId`, `createdAt`, `updatedAt`.
-- `JobApplication`: `id`, `job`, `candidate`, `resumeUrl`, `coverLetter`, `status`, `appliedAt`.
-- `SavedJob`: `id`, `user`, `job`, `savedAt`.
 
 ---
 
