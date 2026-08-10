@@ -1,17 +1,29 @@
-# 💼 JobHub — Full-Stack Job Portal & AI Recommendation System
+# 💼 JobHub — Full-Stack Job Portal & AI Candidate Recommendation System
 
 ![Java](https://img.shields.io/badge/Java-21-orange.svg)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen.svg)
 ![Spring Security](https://img.shields.io/badge/Spring%20Security-JWT-red.svg)
 ![React](https://img.shields.io/badge/React-18-blue.svg)
-![AI Matching](https://img.shields.io/badge/AI-NLP%20%26%20Jaccard%20Similarity-purple.svg)
+![AI Engine](https://img.shields.io/badge/AI%20Engine-Jaccard%20Similarity-purple.svg)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-blue.svg)
 ![Vite](https://img.shields.io/badge/Vite-6.x-yellow.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 
-**JobHub** is a production-grade full-stack job portal application built with **Java 21**, **Spring Boot 3**, **MySQL 8**, **React.js**, and an **AI Candidate Recommendation Engine**. 
+**JobHub** is a production-ready full-stack job portal web application built with **Java 21**, **Spring Boot 3**, **MySQL 8**, **React.js**, and an **AI Candidate Recommendation Engine**. 
 
-Everything in this project connects dynamically to real MySQL database entities via Spring Boot REST APIs — with **zero hardcoded fake jobs, fake numbers, or fake companies**.
+Everything in this project connects dynamically to real MySQL database entities via Spring Boot REST APIs — with **zero hardcoded fake jobs, zero fake numbers, and zero fake companies**.
+
+---
+
+## 📄 Resume Project Section (Copy-Paste Ready for Your Resume)
+
+> **JobHub — Full-Stack Job Portal & AI Candidate Recommendation System**  
+> **Tech Stack:** Java 21, Spring Boot 3, Spring Security (JWT), MySQL 8, React 18, Vite, Axios, REST APIs  
+> **AI & Data Science Tech:** Natural Language Processing (NLP) Skill Tokenization, Jaccard Similarity Algorithm, Multi-Factor Weighted Scoring Engine  
+> - **Engineered** a production-ready full-stack job platform supporting Candidate & Recruiter role workflows with stateless **JWT Authentication** and **BCrypt Password Hashing**.
+> - **Implemented** an **AI Candidate Recommendation Engine** (`AiRecommendationService.java`) utilizing NLP skill tokenization, Jaccard Similarity Indexing, and weighted multi-factor scoring (70% Skill + 20% Exp + 10% Location) to compute dynamic candidate match percentages (e.g. 92% Match) and skill gap insights.
+> - **Developed** real-time multi-criteria job search, filtering, and sorting across MySQL database with dynamic pagination (`Page<Job>`).
+> - **Designed** a transparent candidate application status lifecycle pipeline (*APPLIED ➔ REVIEWING ➔ SHORTLISTED ➔ SELECTED / REJECTED*) and 1-click recruiter PDF resume inspection.
 
 ---
 
@@ -49,30 +61,29 @@ jobhub/
 
 ---
 
-## 🛠️ Full Technology Stack (Including AI Tech)
-
-### 🤖 AI & Matching Technology Stack:
-- **AI Recommendation Engine:** Implemented in `AiRecommendationService.java` & `AiRecommendationController.java`.
-- **NLP Text Tokenization:** Lowercasing, punctuation stripping, and canonical skill extraction.
-- **Jaccard Similarity Index:** Mathematical set distance algorithm for skill overlap computation ($J(A,B) = \frac{|A \cap B|}{|A \cup B|}$).
-- **Cosine Similarity Model:** Vector space similarity representation.
-- **Weighted Match Engine:** $70\% \text{ Skill Match} + 20\% \text{ Experience Match} + 10\% \text{ Location Match}$.
-- **Skill Gap Analysis:** Set difference operator $(B \setminus A)$ to generate automated developer learning advice.
+## 🛠️ Fact-Checked Technology Stack
 
 ### ⚙️ Backend Technology Stack:
 - **Language:** Java 21
 - **Framework:** Spring Boot 3.x (Spring Web, Spring Data JPA, Hibernate ORM)
-- **Security:** Spring Security, Stateless **JWT Bearer Token** Authentication, **BCrypt** Password Hashing ($2^{10}$ rounds)
+- **Security:** Spring Security, Stateless **JWT Bearer Token** Authentication, **BCrypt** Password Hashing
 - **Database:** MySQL 8.0 Relational Database
 - **Containerization:** Docker (Multi-stage Eclipse Temurin JRE build)
+
+### 🤖 AI & Matching Technology Stack:
+- **AI Engine Implementation:** `AiRecommendationService.java` & `AiRecommendationController.java`
+- **NLP Skill Normalization:** Text cleaning, case normalization, and canonical skill extraction
+- **Jaccard Similarity Index:** Mathematical set overlap algorithm for computing skill similarity ($J(A,B) = \frac{|A \cap B|}{|A \cup B|}$)
+- **Weighted Multi-Factor Match Engine:** $70\% \text{ Skill Match} + 20\% \text{ Exp Match} + 10\% \text{ Location Match}$
+- **Skill Gap & Learning Advisor:** Set difference operator $(B \setminus A)$ for generating candidate learning recommendations
 
 ### 🎨 Frontend Technology Stack:
 - **Library:** React.js 18
 - **Build Tool:** Vite 6.x
 - **Routing:** React Router v6 (Single Page Application)
-- **HTTP Client:** Axios (With Request & Response Interceptors)
+- **HTTP Client:** Axios (With Bearer Token Request Interceptor & Response Interceptor)
 - **Icons:** Lucide React Icons
-- **Styling:** Custom CSS3 (CSS Variables, Flexbox, Responsive Grid)
+- **Styling:** Custom CSS3 (Variables, Flexbox, Responsive Grid)
 
 ---
 
@@ -123,17 +134,6 @@ jobhub/
 
 ---
 
-## 📄 Resume Project Description (Ready to Copy-Paste)
-
-> **JobHub — Full-Stack Job Portal & AI Recommendation System**  
-> *Tech Stack: Java 21, Spring Boot 3, Spring Security (JWT), MySQL 8, React 18, Vite, Axios, REST APIs, Jaccard Similarity Match Algorithm*
-> - **Engineered** a production-ready full-stack job platform supporting Candidate & Recruiter workflows with stateless **JWT Authentication** and **BCrypt Password Encryption**.
-> - **Implemented** an **AI Candidate Recommendation Engine** (`AiRecommendationService.java`) utilizing skill tokenization, Jaccard Similarity Indexing, and weighted multi-factor scoring (70% Skill + 20% Exp + 10% Location) to compute dynamic match percentages and skill gap insights.
-> - **Developed** multi-criteria search, filtering, and sorting across MySQL database with dynamic pagination (`Page<Job>`).
-> - **Designed** a transparent candidate application status lifecycle pipeline (*APPLIED ➔ REVIEWING ➔ SHORTLISTED ➔ SELECTED*) and 1-click recruiter PDF resume inspection.
-
----
-
 ## 💻 How to Run Locally
 
 ### 1. Database Setup
@@ -145,7 +145,7 @@ CREATE DATABASE jobhub_db;
 ### 2. Backend Setup
 ```bash
 cd backend
-# Update MySQL password in src/main/resources/application.properties
+# Configure MySQL password in src/main/resources/application.properties
 ./mvnw spring-boot:run
 ```
 *(Backend runs at `http://localhost:8080`)*
