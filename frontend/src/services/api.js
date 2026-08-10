@@ -19,6 +19,28 @@ const API = axios.create({
   },
 });
 
+// In-Memory Fast Cache Map & TTL (2 Minutes)
+const cache = new Map();
+const CACHE_TTL_MS = 2 * 60 * 1000; // 2 Minutes
+
+const getCachedData = (key) => {
+  const cached = cache.get(key);
+  if (!cached) return null;
+  if (Date.now() - cached.timestamp > CACHE_TTL_MS) {
+    cache.delete(key);
+    return null;
+  }
+  return cached.data;
+};
+
+const setCachedData = (key, data) => {
+  cache.set(key, { data, timestamp: Date.now() });
+};
+
+export const clearApiCache = () => {
+  cache.clear();
+};
+
 // Request Interceptor: Attach JWT Bearer Token
 API.interceptors.request.use(
   (config) => {
@@ -31,18 +53,39 @@ API.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response Interceptor: Global error handling
+// Response Interceptor: Global error handling & automatic cache invalidation on mutations
 API.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Invalidate cache on mutations (POST, PUT, DELETE)
+    if (['post', 'put', 'delete'].includes(response.config.method?.toLowerCase())) {
+      cache.clear();
+    }
+    return response;
+  },
   (error) => {
     if (error.response && error.response.status === 401) {
       // Token expired or invalid
       localStorage.removeItem('jobhub_token');
       localStorage.removeItem('jobhub_user');
+      cache.clear();
     }
     return Promise.reject(error);
   }
 );
+
+// Helper for Cached GET Requests (Instant 0ms Response!)
+const cachedGet = async (url, config = {}) => {
+  const cacheKey = url + JSON.stringify(config.params || {});
+  const cached = getCachedData(cacheKey);
+  if (cached) {
+    // Return cached response instantly and fetch fresh data in background
+    API.get(url, config).then(res => setCachedData(cacheKey, res)).catch(() => {});
+    return cached;
+  }
+  const response = await API.get(url, config);
+  setCachedData(cacheKey, response);
+  return response;
+};
 
 // API Endpoints Services
 export const authService = {
@@ -51,58 +94,58 @@ export const authService = {
 };
 
 export const userService = {
-  getUserById: (id) => API.get(`/users/${id}`),
+  getUserById: (id) => cachedGet(`/users/${id}`),
   updateUser: (id, data) => API.put(`/users/${id}`, data),
 };
 
 export const jobService = {
-  getAllJobs: () => API.get('/jobs'),
-  getLatestJobs: () => API.get('/jobs/latest'),
-  getCategories: () => API.get('/jobs/categories'),
-  getJobById: (id) => API.get(`/jobs/${id}`),
-  searchJobs: (params) => API.get('/jobs/search', { params }),
+  getAllJobs: () => cachedGet('/jobs'),
+  getLatestJobs: () => cachedGet('/jobs/latest'),
+  getCategories: () => cachedGet('/jobs/categories'),
+  getJobById: (id) => cachedGet(`/jobs/${id}`),
+  searchJobs: (params) => cachedGet('/jobs/search', { params }),
   createJob: (data) => API.post('/jobs', data),
   updateJob: (id, data) => API.put(`/jobs/${id}`, data),
   deleteJob: (id) => API.delete(`/jobs/${id}`),
-  getRecruiterJobs: (recruiterId) => API.get(`/jobs/recruiter/${recruiterId}`),
+  getRecruiterJobs: (recruiterId) => cachedGet(`/jobs/recruiter/${recruiterId}`),
 };
 
 export const companyService = {
-  getAllCompanies: (params) => API.get('/companies', { params }),
-  searchCompanies: (params) => API.get('/companies/search', { params }),
-  getCompanyById: (id) => API.get(`/companies/${id}`),
-  getCompanyJobs: (id, params) => API.get(`/companies/${id}/jobs`, { params }),
-  getCompanyStats: () => API.get('/companies/stats'),
+  getAllCompanies: (params) => cachedGet('/companies', { params }),
+  searchCompanies: (params) => cachedGet('/companies/search', { params }),
+  getCompanyById: (id) => cachedGet(`/companies/${id}`),
+  getCompanyJobs: (id, params) => cachedGet(`/companies/${id}/jobs`, { params }),
+  getCompanyStats: () => cachedGet('/companies/stats'),
   createOrUpdateCompany: (data) => API.post('/companies', data),
   deleteCompany: (id) => API.delete(`/companies/${id}`),
 };
 
 export const homeService = {
-  getHomeStats: () => API.get('/home/stats'),
+  getHomeStats: () => cachedGet('/home/stats'),
 };
 
 export const applicationService = {
   applyForJob: (data) => API.post('/applications', data),
-  getMyApplications: () => API.get('/applications/my'),
-  getApplicationById: (id) => API.get(`/applications/${id}`),
-  getJobApplications: (jobId) => API.get(`/applications/job/${jobId}`),
+  getMyApplications: () => cachedGet('/applications/my'),
+  getApplicationById: (id) => cachedGet(`/applications/${id}`),
+  getJobApplications: (jobId) => cachedGet(`/applications/job/${jobId}`),
   updateStatus: (id, status) => API.put(`/applications/${id}/status`, { status }),
   withdrawApplication: (id) => API.delete(`/applications/${id}`),
 };
 
 export const savedJobService = {
   saveJob: (jobId) => API.post(`/saved-jobs/${jobId}`),
-  getSavedJobs: () => API.get('/saved-jobs'),
+  getSavedJobs: () => cachedGet('/saved-jobs'),
   removeSavedJob: (jobId) => API.delete(`/saved-jobs/${jobId}`),
 };
 
 export const dashboardService = {
-  getCandidateDashboard: () => API.get('/dashboard/candidate'),
-  getRecruiterDashboard: () => API.get('/dashboard/recruiter'),
+  getCandidateDashboard: () => cachedGet('/dashboard/candidate'),
+  getRecruiterDashboard: () => cachedGet('/dashboard/recruiter'),
 };
 
 export const aiService = {
-  getRecommendations: () => API.get('/ai/recommendations'),
+  getRecommendations: () => cachedGet('/ai/recommendations'),
 };
 
 export default API;
