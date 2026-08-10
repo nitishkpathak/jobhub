@@ -1,0 +1,22 @@
+# Root .gitignore for JobHub Full Stack Application
+
+# Node / Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# Maven / Java / Backend
+backend/target/
+backend/.mvn/
+backend/*.jar
+backend/*.war
+
+# IDE & System Files
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
