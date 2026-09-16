@@ -50,10 +50,10 @@ public class ApplicationService {
         application.setStatus(ApplicationStatus.APPLIED);
 
         Application savedApplication = applicationRepository.save(application);
-        return mapToResponseDto(savedApplication, job, candidate);
+        return mapToResponseDto(savedApplication, job, candidate, false);
     }
 
-    // Get My Applications (Candidate Only)
+    // Get My Applications (Candidate Only - Optimized for fast list loading)
     public List<ApplicationResponseDto> getCandidateApplications(String candidateEmail) {
         User candidate = userRepository.findByEmail(candidateEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("Candidate account not found"));
@@ -62,12 +62,12 @@ public class ApplicationService {
                 .stream()
                 .map(app -> {
                     Job job = jobRepository.findById(app.getJobId()).orElse(null);
-                    return mapToResponseDto(app, job, candidate);
+                    return mapToResponseDto(app, job, candidate, true);
                 })
                 .collect(Collectors.toList());
     }
 
-    // Get Application Details By ID
+    // Get Application Details By ID (Full Detail with Resume)
     public ApplicationResponseDto getApplicationById(Long applicationId, String userEmail) {
         Application application = applicationRepository.findById(applicationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Application not found with id: " + applicationId));
@@ -86,7 +86,7 @@ public class ApplicationService {
         }
 
         User candidate = userRepository.findById(application.getCandidateId()).orElse(null);
-        return mapToResponseDto(application, job, candidate);
+        return mapToResponseDto(application, job, candidate, false);
     }
 
     // Get Applications For A Job (Recruiter Owner Only)
@@ -105,7 +105,7 @@ public class ApplicationService {
                 .stream()
                 .map(app -> {
                     User candidate = userRepository.findById(app.getCandidateId()).orElse(null);
-                    return mapToResponseDto(app, job, candidate);
+                    return mapToResponseDto(app, job, candidate, true);
                 })
                 .collect(Collectors.toList());
     }
@@ -129,7 +129,7 @@ public class ApplicationService {
         Application updatedApp = applicationRepository.save(application);
 
         User candidate = userRepository.findById(application.getCandidateId()).orElse(null);
-        return mapToResponseDto(updatedApp, job, candidate);
+        return mapToResponseDto(updatedApp, job, candidate, false);
     }
 
     // Withdraw / Delete Application (Candidate Only)
@@ -147,8 +147,12 @@ public class ApplicationService {
         applicationRepository.delete(application);
     }
 
-    // Helper: Map Application -> Response DTO
-    private ApplicationResponseDto mapToResponseDto(Application app, Job job, User candidate) {
+    // Helper: Map Application -> Response DTO (with payload optimization flag for lists)
+    private ApplicationResponseDto mapToResponseDto(Application app, Job job, User candidate, boolean isListQuery) {
+        String resumeUrl = app.getResumeUrl();
+        if (isListQuery && resumeUrl != null && resumeUrl.startsWith("data:")) {
+            resumeUrl = "[ATTACHED_PDF_RESUME]";
+        }
         return new ApplicationResponseDto(
                 app.getId(),
                 app.getJobId(),
@@ -157,7 +161,7 @@ public class ApplicationService {
                 app.getCandidateId(),
                 candidate != null ? candidate.getName() : "Unknown Candidate",
                 candidate != null ? candidate.getEmail() : "Unknown Email",
-                app.getResumeUrl(),
+                resumeUrl,
                 app.getCoverLetter(),
                 app.getStatus(),
                 app.getAppliedAt(),
