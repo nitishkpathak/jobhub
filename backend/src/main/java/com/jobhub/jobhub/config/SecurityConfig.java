@@ -44,8 +44,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**", "/api/home/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/jobs/**", "/api/companies/**", "/api/ai/**").permitAll()
-                        .requestMatchers("/api/applications/**", "/api/saved-jobs/**", "/api/dashboard/**", "/api/users/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/jobs/**", "/api/companies/**", "/api/ai/**", "/api/users/**").permitAll()
+                        .requestMatchers("/api/applications/**", "/api/saved-jobs/**", "/api/dashboard/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
