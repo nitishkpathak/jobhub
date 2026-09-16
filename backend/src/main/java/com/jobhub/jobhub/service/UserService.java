@@ -31,11 +31,17 @@ public class UserService {
         return mapToResponseDto(savedUser);
     }
 
-    // Get All Users
+    // Get All Users (Optimized: sanitize heavy Base64 resume string for instant network response)
     public List<UserResponseDto> getAllUsers() {
         return userRepository.findAll()
                 .stream()
-                .map(this::mapToResponseDto)
+                .map(user -> {
+                    UserResponseDto dto = mapToResponseDto(user);
+                    if (dto.getResumeUrl() != null && dto.getResumeUrl().startsWith("data:")) {
+                        dto.setResumeUrl("[ATTACHED_PDF_RESUME]");
+                    }
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
