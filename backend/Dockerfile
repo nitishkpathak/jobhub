@@ -1,10 +1,10 @@
-# Multi-stage Docker build for Spring Boot Backend using standard Temurin JDK 21
+# Fast multi-stage Docker build with Maven dependency caching for Spring Boot Backend
 FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
-ENV MAVEN_OPTS="-Xmx256m"
 COPY pom.xml .
+RUN mvn dependency:go-offline -B
 COPY src ./src
-RUN mvn clean package -DskipTests
+RUN mvn package -DskipTests
 
 FROM eclipse-temurin:21-jre
 WORKDIR /app
