@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { dashboardService, aiService, savedJobService } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import Loading from '../components/Loading';
 import { 
   FileText, CheckCircle2, Clock, Calendar, Sparkles, Building2, 
   ExternalLink, User, ArrowRight, Bookmark, MapPin, Briefcase, 
@@ -11,12 +10,19 @@ import {
 
 const CandidateDashboard = () => {
   const { user } = useAuth();
-  const [stats, setStats] = useState(null);
+  
+  // Default non-blocking initial stats (0ms instant render!)
+  const [stats, setStats] = useState({
+    totalApplications: 0,
+    reviewingApplications: 0,
+    shortlistedApplications: 0,
+    selectedApplications: 0,
+    rejectedApplications: 0,
+    savedJobsCount: 0,
+    recentApplications: []
+  });
   const [aiData, setAiData] = useState(null);
   const [savedJobs, setSavedJobs] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  // Application filter status
   const [appFilter, setAppFilter] = useState('ALL');
 
   useEffect(() => {
@@ -24,19 +30,16 @@ const CandidateDashboard = () => {
   }, []);
 
   const fetchDashboardData = async () => {
-    try {
-      // 1. Fetch main dashboard metrics first (Instant 0ms UI load!)
-      const dashRes = await dashboardService.getCandidateDashboard();
-      if (dashRes?.data?.data) {
-        setStats(dashRes.data.data);
+    // 1. Fetch Candidate Dashboard Metrics (non-blocking)
+    dashboardService.getCandidateDashboard().then(res => {
+      if (res?.data?.data) {
+        setStats(res.data.data);
       }
-    } catch (err) {
+    }).catch(err => {
       console.error('Candidate Dashboard Error', err);
-    } finally {
-      setLoading(false);
-    }
+    });
 
-    // 2. Fetch AI Recommendations & Saved Jobs asynchronously in background
+    // 2. Fetch AI Recommendations & Saved Jobs asynchronously
     aiService.getRecommendations().then(res => {
       if (res?.data?.data) setAiData(res.data.data);
     }).catch(() => {});
@@ -49,13 +52,11 @@ const CandidateDashboard = () => {
   const handleRemoveSavedJob = async (jobId) => {
     try {
       await savedJobService.removeSavedJob(jobId);
-      setSavedJobs(savedJobs.filter(s => s.job.id !== jobId));
+      setSavedJobs(savedJobs.filter(s => s.job?.id !== jobId));
     } catch (err) {
       console.error('Error removing saved job', err);
     }
   };
-
-  if (loading && !stats) return <Loading text="Loading candidate dashboard & real insights..." />;
 
   const recommendationsList = aiData?.recommendations || [];
   const candidateSkills = user?.skills ? user.skills.split(',').map(s => s.trim()) : ['Java', 'Spring Boot', 'MySQL'];
@@ -292,9 +293,11 @@ const CandidateDashboard = () => {
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                       <span className={`badge badge-${app.status}`}>{app.status}</span>
-                      <a href={app.resumeUrl} target="_blank" rel="noreferrer" className="btn btn-secondary btn-sm" title="View Submitted Resume">
-                        <ExternalLink size={14} /> Resume
-                      </a>
+                      {app.resumeUrl && (
+                        <a href={app.resumeUrl} target="_blank" rel="noreferrer" className="btn btn-secondary btn-sm" title="View Submitted Resume">
+                          <ExternalLink size={14} /> Resume
+                        </a>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -324,14 +327,14 @@ const CandidateDashboard = () => {
                   <div key={item.id} style={{ padding: '0.85rem', background: 'var(--background)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
                       <h4 style={{ fontSize: '0.9rem', fontWeight: 700 }}>
-                        <Link to={`/jobs/${item.job.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>{item.job.title}</Link>
+                        <Link to={`/jobs/${item.job?.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>{item.job?.title}</Link>
                       </h4>
-                      <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{item.job.companyName} • {item.job.location}</p>
+                      <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{item.job?.companyName} • {item.job?.location}</p>
                     </div>
 
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <Link to={`/jobs/${item.job.id}`} className="btn btn-primary btn-sm">Apply</Link>
-                      <button onClick={() => handleRemoveSavedJob(item.job.id)} className="btn btn-outline btn-sm" style={{ color: '#ef4444' }} title="Remove Bookmark">
+                      <Link to={`/jobs/${item.job?.id}`} className="btn btn-primary btn-sm">Apply</Link>
+                      <button onClick={() => handleRemoveSavedJob(item.job?.id)} className="btn btn-outline btn-sm" style={{ color: '#ef4444' }} title="Remove Bookmark">
                         <Trash2 size={14} />
                       </button>
                     </div>
