@@ -25,21 +25,25 @@ const CandidateDashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      setLoading(true);
-      const [dashRes, aiRes, savedRes] = await Promise.allSettled([
-        dashboardService.getCandidateDashboard(),
-        aiService.getRecommendations(),
-        savedJobService.getSavedJobs()
-      ]);
-
-      if (dashRes.status === 'fulfilled') setStats(dashRes.value.data.data);
-      if (aiRes.status === 'fulfilled') setAiData(aiRes.value.data.data);
-      if (savedRes.status === 'fulfilled') setSavedJobs(savedRes.value.data.data || []);
+      // 1. Fetch main dashboard metrics first (Instant 0ms UI load!)
+      const dashRes = await dashboardService.getCandidateDashboard();
+      if (dashRes?.data?.data) {
+        setStats(dashRes.data.data);
+      }
     } catch (err) {
       console.error('Candidate Dashboard Error', err);
     } finally {
       setLoading(false);
     }
+
+    // 2. Fetch AI Recommendations & Saved Jobs asynchronously in background
+    aiService.getRecommendations().then(res => {
+      if (res?.data?.data) setAiData(res.data.data);
+    }).catch(() => {});
+
+    savedJobService.getSavedJobs().then(res => {
+      if (res?.data?.data) setSavedJobs(res.data.data || []);
+    }).catch(() => {});
   };
 
   const handleRemoveSavedJob = async (jobId) => {
@@ -51,7 +55,7 @@ const CandidateDashboard = () => {
     }
   };
 
-  if (loading) return <Loading text="Loading candidate dashboard & real insights..." />;
+  if (loading && !stats) return <Loading text="Loading candidate dashboard & real insights..." />;
 
   const recommendationsList = aiData?.recommendations || [];
   const candidateSkills = user?.skills ? user.skills.split(',').map(s => s.trim()) : ['Java', 'Spring Boot', 'MySQL'];
