@@ -19,26 +19,53 @@ const API = axios.create({
   },
 });
 
-// In-Memory Fast Cache Map & TTL (2 Minutes)
-const cache = new Map();
-const CACHE_TTL_MS = 2 * 60 * 1000; // 2 Minutes
+// Persistent LocalStorage + In-Memory Fast Caching Engine (24 Hours Fallback)
+const inMemoryCache = new Map();
+const CACHE_KEY_PREFIX = 'jh_cache_';
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 Hours
 
 const getCachedData = (key) => {
-  const cached = cache.get(key);
-  if (!cached) return null;
-  if (Date.now() - cached.timestamp > CACHE_TTL_MS) {
-    cache.delete(key);
-    return null;
+  // 1. Check fast in-memory map
+  const inMemory = inMemoryCache.get(key);
+  if (inMemory) return inMemory.data;
+
+  // 2. Check persistent localStorage
+  try {
+    const stored = localStorage.getItem(CACHE_KEY_PREFIX + key);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (Date.now() - parsed.timestamp < CACHE_TTL_MS) {
+        inMemoryCache.set(key, parsed);
+        return parsed.data;
+      }
+    }
+  } catch (e) {
+    // ignore
   }
-  return cached.data;
+  return null;
 };
 
 const setCachedData = (key, data) => {
-  cache.set(key, { data, timestamp: Date.now() });
+  const item = { data, timestamp: Date.now() };
+  inMemoryCache.set(key, item);
+  try {
+    localStorage.setItem(CACHE_KEY_PREFIX + key, JSON.stringify(item));
+  } catch (e) {
+    // ignore quota errors
+  }
 };
 
 export const clearApiCache = () => {
-  cache.clear();
+  inMemoryCache.clear();
+  try {
+    Object.keys(localStorage).forEach(k => {
+      if (k.startsWith(CACHE_KEY_PREFIX)) {
+        localStorage.removeItem(k);
+      }
+    });
+  } catch (e) {
+    // ignore
+  }
 };
 
 // Request Interceptor: Attach JWT Bearer Token
@@ -58,7 +85,7 @@ API.interceptors.response.use(
   (response) => {
     // Invalidate cache on mutations (POST, PUT, DELETE)
     if (['post', 'put', 'delete'].includes(response.config.method?.toLowerCase())) {
-      cache.clear();
+      clearApiCache();
     }
     return response;
   },
@@ -67,24 +94,32 @@ API.interceptors.response.use(
       // Token expired or invalid
       localStorage.removeItem('jobhub_token');
       localStorage.removeItem('jobhub_user');
-      cache.clear();
+      clearApiCache();
     }
     return Promise.reject(error);
   }
 );
 
-// Helper for Cached GET Requests (Instant 0ms Response!)
+// Helper for Persistent Cached GET Requests (Instant 0ms UI Load!)
 const cachedGet = async (url, config = {}) => {
   const cacheKey = url + JSON.stringify(config.params || {});
   const cached = getCachedData(cacheKey);
+
   if (cached) {
-    // Return cached response instantly and fetch fresh data in background
+    // Return cached response instantly (0ms) and fetch fresh data in background
     API.get(url, config).then(res => setCachedData(cacheKey, res)).catch(() => {});
     return cached;
   }
-  const response = await API.get(url, config);
-  setCachedData(cacheKey, response);
-  return response;
+
+  try {
+    const response = await API.get(url, config);
+    setCachedData(cacheKey, response);
+    return response;
+  } catch (err) {
+    // If network / server error, return stale cache if available
+    if (cached) return cached;
+    throw err;
+  }
 };
 
 // API Endpoints Services
