@@ -3,9 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { jobService } from '../services/api';
 import { Code, Server, Database, TrendingUp, ChevronRight } from 'lucide-react';
 
+const DEFAULT_CATEGORIES = [
+  { name: 'Software Engineering', count: 0 },
+  { name: 'Java & Backend Development', count: 0 },
+  { name: 'React & Frontend Development', count: 0 },
+  { name: 'Data & Database Science', count: 0 },
+  { name: 'DevOps & Cloud', count: 0 }
+];
+
 const Categories = () => {
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
   const navigate = useNavigate();
 
   const iconMap = {
@@ -30,13 +37,12 @@ const Categories = () => {
 
   const fetchCategories = async () => {
     try {
-      setLoading(true);
       const res = await jobService.getCategories();
-      setCategories(res.data.data || []);
+      if (res?.data?.data && res.data.data.length > 0) {
+        setCategories(res.data.data);
+      }
     } catch (err) {
       console.error('Error loading job categories', err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -49,9 +55,7 @@ const Categories = () => {
         </div>
       </div>
 
-      {loading ? (
-        <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>Loading categories...</div>
-      ) : categories.length === 0 ? (
+      {categories.length === 0 ? (
         <div className="card" style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
           Job categories will appear here once jobs are posted.
         </div>

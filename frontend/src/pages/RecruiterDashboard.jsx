@@ -10,8 +10,13 @@ import {
 
 const RecruiterDashboard = () => {
   const { user } = useAuth();
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    totalJobsPosted: 0,
+    totalApplicationsReceived: 0,
+    shortlistedCandidatesCount: 0,
+    selectedCandidatesCount: 0,
+    recentJobs: []
+  });
 
   // Selected job applications view
   const [selectedJobId, setSelectedJobId] = useState(null);
@@ -29,13 +34,12 @@ const RecruiterDashboard = () => {
 
   const fetchDashboardStats = async () => {
     try {
-      setLoading(true);
       const res = await dashboardService.getRecruiterDashboard();
-      setStats(res.data.data);
+      if (res?.data?.data) {
+        setStats(res.data.data);
+      }
     } catch (err) {
       console.error('Error loading recruiter dashboard', err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -73,8 +77,6 @@ const RecruiterDashboard = () => {
       alert(err.response?.data?.message || 'Failed to delete job.');
     }
   };
-
-  if (loading) return <Loading text="Loading recruiter dashboard & applicants..." />;
 
   // Filtered applicants
   const filteredApplicants = jobApplications.filter(app => {

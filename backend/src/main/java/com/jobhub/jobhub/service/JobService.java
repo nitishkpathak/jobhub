@@ -68,7 +68,12 @@ public class JobService {
     // Get Job Categories with live counts from DB
     public List<Map<String, Object>> getCategories() {
         List<Job> allJobs = jobRepository.findAll();
-        Map<String, Long> categoryMap = new HashMap<>();
+        Map<String, Long> categoryMap = new LinkedHashMap<>();
+        categoryMap.put("Software Engineering", 0L);
+        categoryMap.put("Java & Backend Development", 0L);
+        categoryMap.put("React & Frontend Development", 0L);
+        categoryMap.put("Data & Database Science", 0L);
+        categoryMap.put("DevOps & Cloud", 0L);
 
         for (Job job : allJobs) {
             String title = job.getTitle() != null ? job.getTitle().toLowerCase() : "";
