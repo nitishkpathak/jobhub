@@ -14,7 +14,7 @@ const API_BASE_URL = getApiBaseUrl();
 
 const API = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 15000,
+  timeout: 35000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -101,7 +101,7 @@ API.interceptors.response.use(
   }
 );
 
-// Helper for Live GET Requests with Local Cache Fallback
+// Helper for Live GET Requests with Local Cache Fallback & Safe Error Protection
 const cachedGet = async (url, config = {}) => {
   const cacheKey = url + JSON.stringify(config.params || {});
 
@@ -113,7 +113,7 @@ const cachedGet = async (url, config = {}) => {
     // If network / server error, return stale cache if available
     const cached = getCachedData(cacheKey);
     if (cached) return cached;
-    throw err;
+    return { data: { success: false, data: null, message: err.message } };
   }
 };
 
