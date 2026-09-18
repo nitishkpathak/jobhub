@@ -13,7 +13,9 @@ const LatestJobs = () => {
   const { isAuthenticated, isCandidate } = useAuth();
 
   useEffect(() => {
-    fetchLatestJobs();
+    const timer = setTimeout(() => setLoading(false), 4000);
+    fetchLatestJobs().finally(() => clearTimeout(timer));
+    return () => clearTimeout(timer);
   }, [isAuthenticated]);
 
   const fetchLatestJobs = async () => {
