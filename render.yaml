@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: jobhub-backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    region: singapore
+    plan: free
+    branch: main
+    autoDeploy: true
+    envVars:
+      - key: PORT
+        value: 8080
