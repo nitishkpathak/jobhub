@@ -100,16 +100,9 @@ API.interceptors.response.use(
   }
 );
 
-// Helper for Persistent Cached GET Requests (Instant 0ms UI Load!)
+// Helper for Live GET Requests with Local Cache Fallback
 const cachedGet = async (url, config = {}) => {
   const cacheKey = url + JSON.stringify(config.params || {});
-  const cached = getCachedData(cacheKey);
-
-  if (cached) {
-    // Return cached response instantly (0ms) and fetch fresh data in background
-    API.get(url, config).then(res => setCachedData(cacheKey, res)).catch(() => {});
-    return cached;
-  }
 
   try {
     const response = await API.get(url, config);
@@ -117,6 +110,7 @@ const cachedGet = async (url, config = {}) => {
     return response;
   } catch (err) {
     // If network / server error, return stale cache if available
+    const cached = getCachedData(cacheKey);
     if (cached) return cached;
     throw err;
   }

@@ -77,14 +77,17 @@ public class JobService {
 
         for (Job job : allJobs) {
             String title = job.getTitle() != null ? job.getTitle().toLowerCase() : "";
+            String skills = job.getSkills() != null ? job.getSkills().toLowerCase() : "";
+            String combined = title + " " + skills;
+
             String categoryName = "Software Engineering";
-            if (title.contains("java") || title.contains("spring") || title.contains("backend")) {
+            if (combined.contains("java") || combined.contains("spring") || combined.contains("backend") || combined.contains("node") || combined.contains("express")) {
                 categoryName = "Java & Backend Development";
-            } else if (title.contains("react") || title.contains("frontend") || title.contains("web")) {
+            } else if (combined.contains("react") || combined.contains("frontend") || combined.contains("web") || combined.contains("html") || combined.contains("vue") || combined.contains("angular") || combined.contains("css") || combined.contains("ui")) {
                 categoryName = "React & Frontend Development";
-            } else if (title.contains("data") || title.contains("sql") || title.contains("python")) {
+            } else if (combined.contains("data") || combined.contains("sql") || combined.contains("python") || combined.contains("machine") || combined.contains("ai") || combined.contains("analytics")) {
                 categoryName = "Data & Database Science";
-            } else if (title.contains("cloud") || title.contains("devops") || title.contains("aws")) {
+            } else if (combined.contains("cloud") || combined.contains("devops") || combined.contains("aws") || combined.contains("docker") || combined.contains("kubernetes") || combined.contains("azure") || combined.contains("gcp")) {
                 categoryName = "DevOps & Cloud";
             }
 
